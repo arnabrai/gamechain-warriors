@@ -94,7 +94,8 @@ const GameBoard = ({ onGameComplete, isWalletConnected }: GameBoardProps) => {
     ));
 
     if (newFlippedCards.length === 2) {
-      setMoves(prev => prev + 1);
+      const currentMoves = moves + 1;
+      setMoves(currentMoves);
       
       // Check for match after a short delay
       setTimeout(() => {
@@ -122,12 +123,12 @@ const GameBoard = ({ onGameComplete, isWalletConnected }: GameBoardProps) => {
           if (newMatchedPairs === TOTAL_PAIRS) {
             setGameCompleted(true);
             setGameStarted(false);
-            const score = Math.max(1000 - (moves * 10) - (timeElapsed * 2), 200);
+            const score = Math.max(1000 - (currentMoves * 10) - (timeElapsed * 2), 200);
             onGameComplete(score, true);
             
             toast({
               title: "Congratulations! 🏆",
-              description: `You won with ${moves} moves in ${timeElapsed}s! Score: ${score}`,
+              description: `You won with ${currentMoves} moves in ${timeElapsed}s! Score: ${score}`,
             });
           }
         } else {
