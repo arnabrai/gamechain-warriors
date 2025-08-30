@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import GameCard from './GameCard';
-import { Play, RotateCcw, Trophy } from 'lucide-react';
+import { Play, RotateCcw, Trophy, AlertTriangle } from 'lucide-react';
 
 interface GameBoardProps {
   onGameComplete: (score: number, won: boolean) => void;
@@ -15,6 +16,9 @@ interface Card {
   isFlipped: boolean;
   isMatched: boolean;
 }
+
+const MOVE_LIMIT = 15;
+const TOTAL_PAIRS = 8;
 
 const GameBoard = ({ onGameComplete, isWalletConnected }: GameBoardProps) => {
   const [cards, setCards] = useState<Card[]>([]);
@@ -58,9 +62,25 @@ const GameBoard = ({ onGameComplete, isWalletConnected }: GameBoardProps) => {
     setTimeElapsed(0);
   };
 
+  // Check if game should end due to move limit
+  useEffect(() => {
+    if (moves >= MOVE_LIMIT && matchedPairs < TOTAL_PAIRS && gameStarted && !gameCompleted) {
+      setGameCompleted(true);
+      setGameStarted(false);
+      const score = Math.max(100 - (moves * 5), 10);
+      onGameComplete(score, false);
+      
+      toast({
+        title: "Game Over! 💔",
+        description: `You've reached the ${MOVE_LIMIT} move limit. Better luck next time!`,
+        variant: "destructive"
+      });
+    }
+  }, [moves, matchedPairs, gameStarted, gameCompleted, onGameComplete, toast]);
+
   // Handle card click
   const handleCardClick = (cardId: number) => {
-    if (!gameStarted || gameCompleted || flippedCards.length >= 2) return;
+    if (!gameStarted || gameCompleted || flippedCards.length >= 2 || moves >= MOVE_LIMIT) return;
     
     const card = cards.find(c => c.id === cardId);
     if (!card || card.isFlipped || card.isMatched) return;
@@ -89,7 +109,9 @@ const GameBoard = ({ onGameComplete, isWalletConnected }: GameBoardProps) => {
               ? { ...c, isMatched: true }
               : c
           ));
-          setMatchedPairs(prev => prev + 1);
+          
+          const newMatchedPairs = matchedPairs + 1;
+          setMatchedPairs(newMatchedPairs);
           
           toast({
             title: "Match Found! 🎉",
@@ -97,15 +119,15 @@ const GameBoard = ({ onGameComplete, isWalletConnected }: GameBoardProps) => {
           });
 
           // Check if game is complete
-          if (matchedPairs + 1 === 8) {
+          if (newMatchedPairs === TOTAL_PAIRS) {
             setGameCompleted(true);
             setGameStarted(false);
-            const score = Math.max(1000 - (moves * 10) - (timeElapsed * 2), 100);
+            const score = Math.max(1000 - (moves * 10) - (timeElapsed * 2), 200);
             onGameComplete(score, true);
             
             toast({
               title: "Congratulations! 🏆",
-              description: `You won with ${moves + 1} moves in ${timeElapsed}s! Score: ${score}`,
+              description: `You won with ${moves} moves in ${timeElapsed}s! Score: ${score}`,
             });
           }
         } else {
@@ -138,6 +160,9 @@ const GameBoard = ({ onGameComplete, isWalletConnected }: GameBoardProps) => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const remainingMoves = MOVE_LIMIT - moves;
+  const isNearLimit = remainingMoves <= 3 && gameStarted && !gameCompleted;
+
   if (!isWalletConnected) {
     return (
       <div className="text-center py-12 px-6 bg-gradient-card rounded-2xl border border-primary/20">
@@ -160,11 +185,13 @@ const GameBoard = ({ onGameComplete, isWalletConnected }: GameBoardProps) => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 bg-gradient-card rounded-2xl border border-primary/20">
         <div className="flex items-center gap-6">
           <div className="text-center">
-            <div className="text-2xl font-bold text-primary">{moves}</div>
+            <div className={`text-2xl font-bold ${isNearLimit ? 'text-destructive animate-pulse' : 'text-primary'}`}>
+              {moves}/{MOVE_LIMIT}
+            </div>
             <div className="text-sm text-muted-foreground">Moves</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-secondary">{matchedPairs}/8</div>
+            <div className="text-2xl font-bold text-secondary">{matchedPairs}/{TOTAL_PAIRS}</div>
             <div className="text-sm text-muted-foreground">Pairs</div>
           </div>
           <div className="text-center">
@@ -195,6 +222,16 @@ const GameBoard = ({ onGameComplete, isWalletConnected }: GameBoardProps) => {
         </div>
       </div>
 
+      {/* Move Limit Warning */}
+      {isNearLimit && (
+        <div className="flex items-center gap-3 p-4 bg-destructive/10 border border-destructive/20 rounded-xl">
+          <AlertTriangle className="w-5 h-5 text-destructive" />
+          <p className="text-destructive font-medium">
+            Warning: Only {remainingMoves} moves remaining!
+          </p>
+        </div>
+      )}
+
       {/* Game Grid */}
       {cards.length > 0 && (
         <div className="grid grid-cols-4 gap-4 p-6 bg-gradient-card rounded-2xl border border-primary/20">
@@ -206,7 +243,7 @@ const GameBoard = ({ onGameComplete, isWalletConnected }: GameBoardProps) => {
               isFlipped={card.isFlipped}
               isMatched={card.isMatched}
               onClick={handleCardClick}
-              disabled={!gameStarted || flippedCards.length >= 2}
+              disabled={!gameStarted || flippedCards.length >= 2 || moves >= MOVE_LIMIT}
             />
           ))}
         </div>
@@ -218,7 +255,8 @@ const GameBoard = ({ onGameComplete, isWalletConnected }: GameBoardProps) => {
           <h3 className="text-xl font-bold mb-4 gradient-text">How to Play Monad Fusion</h3>
           <div className="text-muted-foreground space-y-2 max-w-md mx-auto">
             <p>🎯 Find matching pairs by flipping cards</p>
-            <p>⚡ Match all 8 pairs to win</p>
+            <p>⚡ Match all {TOTAL_PAIRS} pairs to win</p>
+            <p>🚨 You have only {MOVE_LIMIT} moves to complete the game</p>
             <p>🏆 Earn points based on speed and moves</p>
             <p>💎 Compete on the leaderboard</p>
           </div>
