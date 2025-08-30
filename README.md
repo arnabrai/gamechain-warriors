@@ -1,73 +1,66 @@
-# Welcome to your Lovable project
+# Monad Fusion
 
-## Project info
+A blockchain-based card matching game with MetaMask wallet integration and real-time leaderboards.
 
-**URL**: https://lovable.dev/projects/4132029f-fa5a-4a76-9b21-d44b05b4f331
+## 🎮 Game Features
 
-## How can I edit this code?
+- **Card Matching Game**: Match pairs of cards within 15 moves
+- **MetaMask Integration**: Connect your wallet to play and track stats
+- **Real-time Leaderboard**: Compete with other players globally  
+- **Player Stats**: Track wins, losses, XP, and wallet balance
+- **Game History**: View your complete game record
+- **Beautiful UI**: Futuristic dark theme with smooth animations
 
-There are several ways of editing your application.
+## 🚀 How to Play
 
-**Use Lovable**
+1. **Connect Wallet**: Click "Connect Wallet" to link your MetaMask
+2. **Start Game**: Click "Start New Game" to begin
+3. **Match Cards**: Flip cards to find matching pairs
+4. **Win**: Complete all pairs within 15 moves to win XP and climb the leaderboard
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/4132029f-fa5a-4a76-9b21-d44b05b4f331) and start prompting.
+## 🛠️ Development
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- MetaMask browser extension
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+### Setup
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Navigate to project directory
+cd monad-fusion
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Technologies Used
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- **React** with TypeScript
+- **Vite** for fast development
+- **Tailwind CSS** for styling
+- **shadcn/ui** components
+- **ethers.js** for blockchain interaction
+- **Lucide React** for icons
 
-**Use GitHub Codespaces**
+## 🎯 Game Rules
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- Match all card pairs to win
+- You have exactly 15 moves to complete the game
+- Each successful match earns you XP
+- Climb the leaderboard by winning games
+- Your stats are tied to your connected wallet
 
-## What technologies are used for this project?
+## 🏆 Scoring System
 
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/4132029f-fa5a-4a76-9b21-d44b05b4f331) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- **Win**: +100 XP
+- **Loss**: No XP penalty
+- **Leaderboard**: Ranked by total XP earned
+- **Stats**: Persistent across sessions via wallet connection
